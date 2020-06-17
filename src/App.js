@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
+import storage from 'local-storage-fallback'
 import "./styles.css";
 
 const GlobalStyle = createGlobalStyle`
@@ -9,9 +10,18 @@ body {
   color: ${propos => (propos.theme.mode === "dark" ? "#EEE" : "#111")};
 }
 `;
+
+function getInitialTheme () {
+  const savedTheme = storage.getItem('theme')
+  return savedTheme ? JSON.parse(savedTheme) : { mode: "light" }
+}
+
 export default function App() {
-  const [theme, setTheme] = useState({ mode: "light" });
-  return (
+  const [theme, setTheme] = useState(getInitialTheme);
+  useEffect(()=>{
+    storage.setItem('theme', JSON.stringify(theme))}, [theme]);
+  
+    return (
     <ThemeProvider theme={theme}>
       <>
         <GlobalStyle />
@@ -32,3 +42,4 @@ export default function App() {
     </ThemeProvider>
   );
 }
+
